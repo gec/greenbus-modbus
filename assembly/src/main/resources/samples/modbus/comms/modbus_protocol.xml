@@ -1,0 +1,189 @@
+<Master xmlns="io.greenbus.protocol.modbus">
+    <!--
+        Specifies TCP address of Modbus device.
+
+        Attributes:
+            - Address: IP address of device
+            - Port: IP port of device
+    -->
+    <TCPClient Address="127.0.0.1" Port="502"/>
+    <!--
+        Specifies the framing protocol for the Modbus connection. The "RTU" protocol tunnels the Modbus serial
+        protocol over TCP/IP. The "TCPIP" protocol uses the Modbus TCP/IP headers.
+
+        Attributes:
+            - Type: Values are "RTU" or "TCPIP".
+    -->
+    <Protocol Type="TCPIP"/>
+    <!--
+        Specifies the Modbus address for the device.
+
+        Attributes:
+            - Address: Integer value of Modbus device.
+    -->
+    <Stack Address="3"/>
+    <Polls>
+        <!--
+            Specifies a schedule of polls to retrieve data.
+
+            Attributes:
+                - Type: Type of Modbus data to poll for. Options:
+                    - DiscreteInput
+                    - CoilStatus
+                    - InputRegister
+                    - HoldingRegister
+                - Start: First index in the range to be read
+                - Count: Number of indexes, from the start index, to be read
+                - IntervalMs: Time in milliseconds between polls.
+                - TimeoutMs: Time in milliseconds to wait for a response until a request is considered a failure.
+
+        -->
+        <Poll Type="DiscreteInput" Start="0" Count="20" IntervalMs="1000" TimeoutMs="2000"/>
+        <Poll Type="CoilStatus" Start="0" Count="20" IntervalMs="1000" TimeoutMs="2000"/>
+        <Poll Type="InputRegister" Start="0" Count="20" IntervalMs="1000" TimeoutMs="2000"/>
+        <Poll Type="HoldingRegister" Start="0" Count="20" IntervalMs="1000" TimeoutMs="2000"/>
+    </Polls>
+    <!--
+        Index Mapping
+
+        Note that while Modbus device descriptions sometimes list "numbers" for entities starting with 1,
+        the indexes in the wire protocol are 0-indexed and these are what are specified in the mapping entries.
+
+        Also, the traditional offsets for input types (i.e. 30001 for input registers) are not used.
+    -->
+    <!--
+        Analog Value Mapping
+
+        Indexes into the input registers and holding registers refer to 16-bit (2 byte) blocks of data. Depending
+        on the device description, these values may need to be interpreted as signed or unsigned integers or floating
+        points of varying lengths. Mapping entries with conversion types greater than 16-bits are assumed to extend
+        into the next highest registers (i.e. a UInt32BE at index 2 is stored in 2 and 3, the next distinct value is
+        then at index 4).
+
+        The endian-ness of conversions describes in what order multiple registers are combined. All 16-bit blocks are
+        assumed to be big-endian (the first, lower, index refers to the most significant byte of the register).
+
+        The following enumeration determines how values are interpreted by the Modbus adapter:
+
+            - SInt16: the single register is interpreted as a signed integer value.
+            - UInt16: the single register is interpreted as an unsigned integer value.
+            - SInt32LE: the two registers are combined with the least significant in the lower index, and interpreted as a signed integer value.
+            - UInt32LE: the two registers are combined with the least significant in the lower index, and interpreted as an unsigned integer value.
+            - SInt32BE: the two registers are combined with the most significant in the lower index, and interpreted as a signed integer value.
+            - UInt32BE: the two registers are combined with the most significant in the lower index, and interpreted as an unsigned integer value.
+            - Float32LE: the two registers are combined with the least significant in the lower index, and interpreted as a 32-bit floating-point value.
+            - Float32BE: the two registers are combined with the most significant in the lower index, and interpreted as a 32-bit floating-point value.
+            - Float64LE: the next four registers are combined in order from least significant to most, and interpreted as a 64-bit floating-point value.
+            - Float64BE: the next four registers are combined in order from most significant to least, and interpreted as a 64-bit floating-point value.
+    -->
+    <DiscreteInputMap>
+        <!--
+            Mapping of Modbus "discrete input" points to GreenBus points.
+
+            Will provide GreenBus Measurements with boolean values.
+
+            Attributes:
+            - Index: Modbus index
+            - Name: GreenBus point name
+        -->
+        <Mapping Index="0" Name="Modbus_IED.DiscreteInput00"/>
+        <Mapping Index="1" Name="Modbus_IED.DiscreteInput01"/>
+    </DiscreteInputMap>
+    <CoilStatusMap>
+        <!--
+            Mapping of Modbus "coil status" points to GreenBus points.
+
+            Will provide GreenBus Measurements with boolean values.
+
+            Attributes:
+            - Index: Modbus index
+            - Name: GreenBus point name
+        -->
+        <Mapping Index="0" Name="Modbus_IED.CoilStatus00"/>
+        <Mapping Index="1" Name="Modbus_IED.CoilStatus01"/>
+    </CoilStatusMap>
+    <InputRegisterMap>
+        <!--
+            Mapping of Modbus "input register" points to GreenBus points.
+
+            Will provide GreenBus Measurements with integer or floating-point values.
+
+            Additionally, bitmasks can be specified for UInt16 values in order to map a subset of the register's
+            bits to a point. The value of the 'BitMask' attribute is logically 'and'ed to the register value,
+            and the resulting integer becomes the value mapped to the GreenBus point. The value of the 'BitMask'
+            attribute can either be an integer (i.e. "10") or a hexadecimal string when prefaced by "0x" (i.e.
+            "0x0A").
+
+            Attributes:
+            - Index: Modbus index
+            - Type: Specifies how one or more 16-bit registers at this index should be converted to values
+            - Name: GreenBus point name
+            - BitMask: Optional. Specifies a 16-bit mask to be logically 'and'ed to the register value.
+        -->
+        <Mapping Index="0" Type="UInt16" Name="Modbus_IED.InputRegister00"/>
+        <Mapping Index="1" Type="UInt32BE" Name="Modbus_IED.InputRegister01"/>
+
+        <Mapping Index="2" Type="UInt16" Name="Modbus_IED.InputRegister03Mask1" BitMask="0x01"/>
+        <Mapping Index="2" Type="UInt16" Name="Modbus_IED.InputRegister03Mask2" BitMask="2"/>
+    </InputRegisterMap>
+    <HoldingRegisterMap>
+        <!--
+            Mapping of Modbus "holding register" points to GreenBus points.
+
+            Will provide GreenBus Measurements with integer or floating-point values.
+
+            Additionally, bitmasks can be specified for UInt16 values in order to map a subset of the register's
+            bits to a point. The value of the 'BitMask' attribute is logically 'and'ed to the register value,
+            and the resulting integer becomes the value mapped to the GreenBus point. The value of the 'BitMask'
+            attribute can either be an integer (i.e. "10") or a hexadecimal string when prefaced by "0x" (i.e.
+            "0x0A").
+
+            Attributes:
+            - Index: Modbus index
+            - Type: Specifies how one or more 16-bit registers at this index should be converted to values
+            - Name: GreenBus point name
+            - BitMask: Optional. Specifies a 16-bit mask to be logically 'and'ed to the register value.
+            - ShiftRight: Optional. When 'BitMask' is used, the resulting value then is transformed by
+                the binary shift right operation this many times.
+        -->
+        <Mapping Index="0" Type="SInt16" Name="Modbus_IED.HoldingRegister00"/>
+        <Mapping Index="1" Type="Float32LE" Name="Modbus_IED.HoldingRegister01"/>
+
+        <Mapping Index="2" Type="UInt16" Name="Modbus_IED.HoldingRegister03Mask1" BitMask="0x01"/>
+        <Mapping Index="2" Type="UInt16" Name="Modbus_IED.HoldingRegister03Mask2" BitMask="2"/>
+        <Mapping Index="2" Type="UInt16" Name="Modbus_IED.HoldingRegister03Mask2" BitMask="0xFF00" ShiftRight="8"/>
+    </HoldingRegisterMap>
+    <CommandMap>
+        <!--
+            Mapping of GreenBus commands to Modbus outputs.
+
+            Commands can be mapped to Modbus writes to coils (boolean) or registers (integers). GreenBus controls
+            (commands with no values) are associated with coils by using the "Coil" CommandType and providing a
+            constant boolean value to write to the coil. GreenBus setpoints (commands with values) are associated
+            with registers by using the "Register" CommandType. Additionally, registers can be associated with controls
+            by providing a constant integer value (e.g. to reset a register to 0).
+
+            Attributes:
+            - Name: GreenBus command name
+            - CommandType: Modbus output type. Possible values are "Coil" and "Register".
+            - Index: Modbus index of the coil or register to write.
+            - ConstBoolValue: Optional. Specifies a value for coil writes. Must be present and either "true" or "false".
+            - ConstIntValue: Optional. Specifies a value for register writes. If present, the register write maps to a GreenBus
+                control. If no value is present, the register maps to a GreenBus setpoint and the setpoint value is
+                written to the register.
+            - BitMaskToUpdate: Optional. Specifies a 16-bit mask that defines a subset of the register to write. The resulting
+                write will be the bits of the setpoint in the mask combined with the bits of the previous holding register value
+                not in the mask. A read of the holding register is performed to retrieve the previous value.
+            - ShiftLeft: Optional. If using a bitmask, the setpoint value is first transformed by the binary shift left operation
+                this many times before being combined with the previous value.
+
+        -->
+        <Mapping Name="Modbus_IED.WriteCoil00High" CommandType="Coil" Index="0" ConstBoolValue="true"/>
+        <Mapping Name="Modbus_IED.WriteCoil00Low" CommandType="Coil" Index="0" ConstBoolValue="false"/>
+
+        <Mapping Name="Modbus_IED.WriteRegister00" CommandType="Register" Index="0" />
+        <Mapping Name="Modbus_IED.WriteRegister01" CommandType="Register" Index="1" ConstIntValue="0"/>
+        <Mapping Name="Modbus_IED.WriteRegister02A" CommandType="Register" Index="2" BitMaskToUpdate="0xF0" ShiftLeft="4"/>
+        <Mapping Name="Modbus_IED.WriteRegister02B" CommandType="Register" Index="2" BitMaskToUpdate="0x1E00" ShiftLeft="9"/>
+    </CommandMap>
+</Master>

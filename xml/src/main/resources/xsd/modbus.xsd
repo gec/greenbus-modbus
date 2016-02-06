@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+
+    Copyright 2011-2016 Green Energy Corp.
+
+    Licensed to Green Energy Corp (www.greenenergycorp.com) under one or more
+    contributor license agreements. See the NOTICE file distributed with this
+    work for additional information regarding copyright ownership. Green Energy
+    Corp licenses this file to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+    License for the specific language governing permissions and limitations under
+    the License.
+
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="io.greenbus.protocol.modbus"
+           xmlns="io.greenbus.protocol.modbus"
+           elementFormDefault="qualified">
+
+    <!--
+      Root Element
+    -->
+    <xs:element name="Master">
+        <xs:complexType>
+            <xs:all>
+                <xs:element ref="TCPClient" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Protocol" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Stack" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="Polls" minOccurs="1" maxOccurs="1"/>
+                <xs:element ref="DiscreteInputMap" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="CoilStatusMap" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="InputRegisterMap" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="HoldingRegisterMap" minOccurs="0" maxOccurs="1"/>
+                <xs:element ref="CommandMap" minOccurs="1" maxOccurs="1" />
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Stack">
+        <xs:complexType>
+            <xs:attribute name="Address" type="xs:unsignedByte"/>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:element name="TCPClient">
+        <xs:complexType>
+            <xs:attribute name="Address" type="xs:string" use="required"/>
+            <xs:attribute name="Port" type="xs:int" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="Polls">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Poll">
+                    <xs:complexType>
+                        <xs:attribute name="Type" type="DataType" use="required"/>
+                        <xs:attribute name="Start" type="xs:int" use="required"/>
+                        <xs:attribute name="Count" type="xs:int" use="required"/>
+                        <xs:attribute name="IntervalMs" type="xs:int" use="required"/>
+                        <xs:attribute name="TimeoutMs" type="xs:int" use="required"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CommandMap">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Mapping">
+                    <xs:complexType>
+                        <xs:attribute name="Name" type="xs:string" use="required" />
+                        <xs:attribute name="CommandType" type="CommandType" use="required" />
+                        <xs:attribute name="Index" type="xs:int" use="required"/>
+                        <xs:attribute name="ConstBoolValue" type="xs:boolean" use="optional"/>
+                        <xs:attribute name="ConstIntValue" type="xs:int" use="optional"/>
+                        <xs:attribute name="BitMaskToUpdate" type="xs:string" use="optional"/>
+                        <xs:attribute name="ShiftLeft" type="xs:int" use="optional"/>
+                        <xs:attribute name="RegisterCount" type="xs:int" use="optional"/>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="DiscreteInputMap">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Mapping">
+                    <xs:complexType>
+                        <xs:complexContent>
+                            <xs:extension base="booleanValue" />
+                        </xs:complexContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="CoilStatusMap">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Mapping">
+                    <xs:complexType>
+                        <xs:complexContent>
+                            <xs:extension base="booleanValue" />
+                        </xs:complexContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="InputRegisterMap">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Mapping">
+                    <xs:complexType>
+                        <xs:complexContent>
+                            <xs:extension base="numericValue" />
+                        </xs:complexContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="HoldingRegisterMap">
+        <xs:complexType>
+            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                <xs:element name="Mapping">
+                    <xs:complexType>
+                        <xs:complexContent>
+                            <xs:extension base="numericValue" />
+                        </xs:complexContent>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+
+    <xs:complexType name="numericValue">
+        <xs:attribute name="Index" type="xs:int" use="required"/>
+        <xs:attribute name="Type" type="Conversion" use="required"/>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+        <xs:attribute name="BitMask" type="xs:string" use="optional"/>
+        <xs:attribute name="ShiftRight" type="xs:int" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="booleanValue">
+        <xs:attribute name="Index" type="xs:int" use="required"/>
+        <xs:attribute name="Name" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="DataType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="DiscreteInput"/>
+            <xs:enumeration value="CoilStatus"/>
+            <xs:enumeration value="InputRegister"/>
+            <xs:enumeration value="HoldingRegister"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CommandType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Coil"/>
+            <xs:enumeration value="Register"/>
+            <xs:enumeration value="MaskRegister"/>
+            <xs:enumeration value="MultipleRegisters"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Conversion">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="SInt16"/>
+            <xs:enumeration value="UInt16"/>
+            <xs:enumeration value="SInt32LE"/>
+            <xs:enumeration value="UInt32LE"/>
+            <xs:enumeration value="SInt32BE"/>
+            <xs:enumeration value="UInt32BE"/>
+            <xs:enumeration value="Float32LE"/>
+            <xs:enumeration value="Float32BE"/>
+            <xs:enumeration value="Float64LE"/>
+            <xs:enumeration value="Float64BE"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+    <xs:element name="Protocol">
+        <xs:complexType>
+            <xs:attribute name="Type" type="ProtocolType" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:simpleType name="ProtocolType">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="RTU"/>
+            <xs:enumeration value="TCPIP"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+
+
+</xs:schema>

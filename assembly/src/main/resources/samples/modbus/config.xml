@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="xml.ldr.greenbus.io">
+    <equipmentModel>
+        <equipment name="DeviceContainer">
+            <type name="Root"/>
+            <type name="EquipmentGroup"/>
+
+            <equipment name="Modbus_IED">
+                <type name="Equipment"/>
+
+                <status name="Modbus_IED.DiscreteInput00" unit="status">
+                    <type name="Point"/>
+                    <commands>
+                        <reference name="Modbus_IED.WriteCoil00High"/>
+                        <reference name="Modbus_IED.WriteCoil00Low"/>
+                    </commands>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.DiscreteInput01" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.CoilStatus00" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.CoilStatus01" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </status>
+
+                <analog name="Modbus_IED.InputRegister00" unit="UnitA">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </analog>
+                <analog name="Modbus_IED.InputRegister01" unit="UnitB">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </analog>
+                <status name="Modbus_IED.InputRegister03Mask1" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                        <matchValue intValue="0">
+                            <setBool value="false" activation="HIGH"/>
+                            <setBool value="true" activation="LOW"/>
+                        </matchValue>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.InputRegister03Mask2" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                        <matchValue intValue="0">
+                            <setBool value="false" activation="HIGH"/>
+                            <setBool value="true" activation="LOW"/>
+                        </matchValue>
+                    </triggers>
+                </status>
+
+                <analog name="Modbus_IED.HoldingRegister00" unit="UnitA">
+                    <type name="Point"/>
+                    <commands>
+                        <reference name="Modbus_IED.WriteRegister00"/>
+                    </commands>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </analog>
+                <analog name="Modbus_IED.HoldingRegister01" unit="UnitB">
+                    <type name="Point"/>
+                    <commands>
+                        <reference name="Modbus_IED.WriteRegister01"/>
+                    </commands>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </analog>
+                <status name="Modbus_IED.HoldingRegister03Mask1" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                        <matchValue intValue="0">
+                            <setBool value="false" activation="HIGH"/>
+                            <setBool value="true" activation="LOW"/>
+                        </matchValue>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.HoldingRegister03Mask2" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                        <matchValue intValue="0">
+                            <setBool value="false" activation="HIGH"/>
+                            <setBool value="true" activation="LOW"/>
+                        </matchValue>
+                    </triggers>
+                </status>
+                <status name="Modbus_IED.HoldingRegister03Mask3" unit="status">
+                    <type name="Point"/>
+                    <triggers>
+                        <filter>
+                            <suppress activation="LOW"/>
+                        </filter>
+                    </triggers>
+                </status>
+
+                <control name="Modbus_IED.WriteCoil00High" displayName="SetHigh">
+                    <type name="Command"/>
+                </control>
+                <control name="Modbus_IED.WriteCoil00Low" displayName="SetLow">
+                    <type name="Command"/>
+                </control>
+
+                <setpoint name="Modbus_IED.WriteRegister00" displayName="SetValue00">
+                    <type name="Command"/>
+                </setpoint>
+                <control name="Modbus_IED.WriteRegister01" displayName="ResetRegister00">
+                    <type name="Command"/>
+                </control>
+
+                <setpoint name="Modbus_IED.WriteRegister02A" displayName="SetValue02A">
+                    <type name="Command"/>
+                </setpoint>
+                <setpoint name="Modbus_IED.WriteRegister02B" displayName="SetValue02B">
+                    <type name="Command"/>
+                </setpoint>
+
+            </equipment>
+
+        </equipment>
+    </equipmentModel>
+    <endpointModel>
+
+
+        <endpoint name="Modbus_IED_Endpoint" protocol="modbus">
+            <type name="Endpoint" />
+
+            <keyValue key="protocolConfig" fileName="comms/modbus_protocol.xml"/>
+
+            <source name="Modbus_IED.DiscreteInput00"/>
+            <source name="Modbus_IED.DiscreteInput01"/>
+            <source name="Modbus_IED.CoilStatus00"/>
+            <source name="Modbus_IED.CoilStatus01"/>
+
+            <source name="Modbus_IED.InputRegister00"/>
+            <source name="Modbus_IED.InputRegister01"/>
+            <source name="Modbus_IED.InputRegister03Mask1"/>
+            <source name="Modbus_IED.InputRegister03Mask2"/>
+
+            <source name="Modbus_IED.HoldingRegister00"/>
+            <source name="Modbus_IED.HoldingRegister01"/>
+            <source name="Modbus_IED.HoldingRegister03Mask1"/>
+            <source name="Modbus_IED.HoldingRegister03Mask2"/>
+            <source name="Modbus_IED.HoldingRegister03Mask3"/>
+
+            <source name="Modbus_IED.WriteCoil00High"/>
+            <source name="Modbus_IED.WriteCoil00Low"/>
+            <source name="Modbus_IED.WriteRegister00"/>
+            <source name="Modbus_IED.WriteRegister01"/>
+            <source name="Modbus_IED.WriteRegister02A"/>
+            <source name="Modbus_IED.WriteRegister02B"/>
+        </endpoint>
+
+    </endpointModel>
+</configuration>
