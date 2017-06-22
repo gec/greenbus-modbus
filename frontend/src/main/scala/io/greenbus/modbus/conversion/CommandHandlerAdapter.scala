@@ -18,6 +18,8 @@
  */
 package io.greenbus.modbus.conversion
 
+import java.nio.ByteBuffer
+
 import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.frontend.ProtocolCommandAcceptor
 import io.greenbus.client.service.proto.Commands.{ CommandRequest, CommandResult, CommandStatus }
@@ -91,6 +93,19 @@ class CommandHandlerAdapter(mappings: Seq[CommandMap.Mapping], ops: ModbusOperat
           }
       }
     }
+    def floatValueOpt(mapping: CommandMap.Mapping): Option[Double] = {
+      Option(mapping.getConstIntValue) match {
+        case Some(constIntVal) => Some(constIntVal.toDouble)
+        case None =>
+          if (request.hasType && request.getType == CommandRequest.ValType.INT) {
+            Some(request.getIntVal.toDouble)
+          } else if (request.hasType && request.getType == CommandRequest.ValType.DOUBLE) {
+            Some(request.getDoubleVal)
+          } else {
+            None
+          }
+      }
+    }
 
     nameMap.get(name) match {
       case None => badRequest("No mapping for command")
@@ -116,21 +131,42 @@ class CommandHandlerAdapter(mappings: Seq[CommandMap.Mapping], ops: ModbusOperat
             }
           }
           case CommandType.MULTIPLE_REGISTERS => {
-            val integerValueOpt: Option[Long] = intValueOpt(mapping)
 
-            integerValueOpt match {
-              case None => badRequest("Setpoint value not present or invalid and no constant value provided")
-              case Some(value) => {
-                val regCount = Option(mapping.getRegisterCount).map(_.toInt).getOrElse(1)
-                if (regCount > 4 || regCount < 1) {
-                  badRequest("Bad configuration, write multiple registers must have count 1-4")
-                }
-                Option(mapping.getBitMaskToUpdate) match {
-                  case None => multiRegisterWrite(mapping.getIndex, regCount, value)
-                  case Some(maskStr) =>
-                    badRequest("Masked writes of multiple registers not supported")
+            val regCount = Option(mapping.getRegisterCount).map(_.toInt).getOrElse(1)
+            if (regCount > 4 || regCount < 1) {
+              badRequest("Bad configuration, write multiple registers must have count 1-4")
+            }
+            Option(mapping.getBitMaskToUpdate) match {
+              case None => {
+
+                if (Option(mapping.getFloatingPoint).contains(true)) {
+
+                  floatValueOpt(mapping) match {
+                    case None => badRequest("Setpoint value not present or invalid and no constant value provided")
+                    case Some(value) => {
+                      if (regCount == 2) {
+                        val asInt = java.lang.Float.floatToIntBits(value.toFloat)
+                        multiRegisterWrite(mapping.getIndex, regCount, asInt.toLong)
+                      } else if (regCount == 4) {
+                        val asLong = java.lang.Double.doubleToLongBits(value)
+                        multiRegisterWrite(mapping.getIndex, regCount, asLong)
+                      } else {
+                        badRequest("Floating point multi register setpoint must be 2 or 4 registers")
+                      }
+                    }
+                  }
+
+                } else {
+                  intValueOpt(mapping) match {
+                    case None => badRequest("Setpoint value not present or invalid and no constant value provided")
+                    case Some(value) => {
+                      multiRegisterWrite(mapping.getIndex, regCount, value)
+                    }
+                  }
                 }
               }
+              case Some(maskStr) =>
+                badRequest("Masked writes of multiple registers not supported")
             }
           }
           case CommandType.MASK_REGISTER => {

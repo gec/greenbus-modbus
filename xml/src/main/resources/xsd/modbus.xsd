@@ -86,6 +86,7 @@
                         <xs:attribute name="BitMaskToUpdate" type="xs:string" use="optional"/>
                         <xs:attribute name="ShiftLeft" type="xs:int" use="optional"/>
                         <xs:attribute name="RegisterCount" type="xs:int" use="optional"/>
+                        <xs:attribute name="FloatingPoint" type="xs:boolean" use="optional"/>
                     </xs:complexType>
                 </xs:element>
             </xs:sequence>

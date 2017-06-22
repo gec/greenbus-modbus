@@ -33,7 +33,7 @@ object ModbusIntegrationConfiguration extends LazyLogging {
   val allPoints = statusPoints union analogPoints
 
   val controls = Set("Device01.Control01", "Device01.Control02")
-  val setpoints = Set("Device01.Setpoint01", "Device01.Setpoint02", "Device01.Setpoint03", "Device01.Setpoint04", "Device01.Setpoint05", "Device01.Setpoint06", "Device01.Setpoint07", "Device01.Setpoint08")
+  val setpoints = Set("Device01.Setpoint01", "Device01.Setpoint02", "Device01.Setpoint03", "Device01.Setpoint04", "Device01.Setpoint05", "Device01.Setpoint06", "Device01.Setpoint07", "Device01.Setpoint08", "Device01.Setpoint09", "Device01.Setpoint10")
   val allCommands = controls union setpoints
 
   def loadActions(actionSet: ActionsList, session: Session): Unit = {
@@ -77,6 +77,8 @@ object ModbusIntegrationConfiguration extends LazyLogging {
     cache.commandPuts += PutCommand(None, s"$deviceName.Setpoint06", Set("Setpoint"), Model.CommandCategory.SETPOINT_INT, s"$deviceName.Setpoint06")
     cache.commandPuts += PutCommand(None, s"$deviceName.Setpoint07", Set("Setpoint"), Model.CommandCategory.SETPOINT_INT, s"$deviceName.Setpoint07")
     cache.commandPuts += PutCommand(None, s"$deviceName.Setpoint08", Set("Setpoint"), Model.CommandCategory.SETPOINT_INT, s"$deviceName.Setpoint08")
+    cache.commandPuts += PutCommand(None, s"$deviceName.Setpoint09", Set("Setpoint"), Model.CommandCategory.SETPOINT_DOUBLE, s"$deviceName.Setpoint09")
+    cache.commandPuts += PutCommand(None, s"$deviceName.Setpoint10", Set("Setpoint"), Model.CommandCategory.SETPOINT_DOUBLE, s"$deviceName.Setpoint10")
 
     cache.endpointPuts += PutEndpoint(None, endpointName, Set(), protocol)
 
@@ -130,6 +132,8 @@ object ModbusIntegrationConfiguration extends LazyLogging {
         |         <Mapping Name="$deviceName.Setpoint06" Index="4" CommandType="MultipleRegisters" RegisterCount="1"/>
         |         <Mapping Name="$deviceName.Setpoint07" Index="4" CommandType="MultipleRegisters" RegisterCount="2"/>
         |         <Mapping Name="$deviceName.Setpoint08" Index="4" CommandType="MultipleRegisters" RegisterCount="4"/>
+        |         <Mapping Name="$deviceName.Setpoint09" Index="4" CommandType="MultipleRegisters" RegisterCount="2" FloatingPoint="true"/>
+        |         <Mapping Name="$deviceName.Setpoint10" Index="4" CommandType="MultipleRegisters" RegisterCount="4" FloatingPoint="true"/>
         |    </CommandMap>
         |</Master>
         |""".stripMargin

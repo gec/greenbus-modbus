@@ -387,6 +387,25 @@ class ModbusIntegrationTest extends FunSuite with Matchers with LazyLogging with
 
     response
   }
+  def issueSp(session: Session, uuid: ModelUUID, v: Double): CommandResult = {
+    val commandClient = CommandService.client(session)
+
+    val select = CommandSelect.newBuilder().addCommandUuids(uuid).build
+
+    val selectResult = Await.result(commandClient.selectCommands(select), 5000.milliseconds)
+
+    val request = Commands.CommandRequest.newBuilder()
+      .setCommandUuid(uuid)
+      .setDoubleVal(v)
+      .setType(Commands.CommandRequest.ValType.DOUBLE)
+      .build()
+
+    val response = Await.result(commandClient.issueCommandRequest(request), 5000.milliseconds)
+
+    Await.result(commandClient.deleteCommandLocks(Seq(selectResult.getId)), 5000.milliseconds)
+
+    response
+  }
 
   // setpoint04, 0x00F0,  0000 0000 1111 0000
   // setpoint05, 0x1E00,  0001 1110 0000 0000
@@ -455,6 +474,48 @@ class ModbusIntegrationTest extends FunSuite with Matchers with LazyLogging with
 
     issueSp(session, setpoint08.getUuid, 0x4000C00FBB800A03L).getStatus should equal(CommandStatus.SUCCESS)
     check(Seq(0x0A03, 0xBB80, 0xC00F, 0x4000))
+  }
+
+  test("Setpoint multi write float") {
+    val session = this.session.get
+
+    val modelClient = ModelService.client(session)
+    val commandClient = CommandService.client(session)
+
+    val commands = Await.result(modelClient.getCommands(EntityKeySet.newBuilder().addAllNames(allCommands.toSeq).build()), 5000.milliseconds)
+    val commandNameMap = commands.map(c => (c.getName, c)).toMap
+
+    val setpoint09 = commandNameMap("Device01.Setpoint09")
+    val setpoint10 = commandNameMap("Device01.Setpoint10")
+
+    slave.setHoldingRegister(4, 0)
+    slave.setHoldingRegister(5, 0)
+    slave.setHoldingRegister(6, 0)
+    slave.setHoldingRegister(7, 0)
+
+    def check(v: Seq[Int]): Unit = {
+      slave.getHoldingRegister(4) should equal(v(0))
+      slave.getHoldingRegister(5) should equal(v(1))
+      slave.getHoldingRegister(6) should equal(v(2))
+      slave.getHoldingRegister(7) should equal(v(3))
+    }
+
+    check(Seq(0, 0, 0, 0))
+
+    issueSp(session, setpoint09.getUuid, 4.0).getStatus should equal(CommandStatus.SUCCESS)
+    check(Seq(0, 0x4080, 0, 0))
+
+    // -500.234 = 0xc3fa1df4
+    issueSp(session, setpoint09.getUuid, -500.234).getStatus should equal(CommandStatus.SUCCESS)
+    check(Seq(0x1DF4, 0xC3FA, 0, 0))
+
+    // 400b333333333333
+    issueSp(session, setpoint10.getUuid, 3.4).getStatus should equal(CommandStatus.SUCCESS)
+    check(Seq(0x3333, 0x3333, 0x3333, 0x400b))
+
+    // c0b593d8ef34d6a1
+    issueSp(session, setpoint10.getUuid, -5523.8474).getStatus should equal(CommandStatus.SUCCESS)
+    check(Seq(0xd6a1, 0xef34, 0x93d8, 0xc0b5))
   }
 
 }
