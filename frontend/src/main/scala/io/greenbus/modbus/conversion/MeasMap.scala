@@ -18,16 +18,16 @@
  */
 package io.greenbus.modbus.conversion
 
-import io.greenbus.client.service.proto.Measurements.{ Quality, Measurement }
+import com.typesafe.scalalogging.LazyLogging
+import io.greenbus.client.service.proto.Measurements.{ Measurement, Quality }
 import io.greenbus.client.service.proto.Measurements
-import com.typesafe.scalalogging.slf4j.Logging
 import io.greenbus.modbus.conversion.MeasMap.ByteX4
 import io.greenbus.modbus.xml._
-import org.totalgrid.modbus.{ ModbusData, ByteX2 }
+import org.totalgrid.modbus.{ ByteX2, ModbusData }
 import org.totalgrid.modbus.ModbusBit
 import org.totalgrid.modbus.ModbusRegister
 
-object MeasMap extends Logging {
+object MeasMap extends LazyLogging {
 
   val good = Quality.newBuilder.setValidity(Quality.Validity.GOOD).build
 
@@ -78,7 +78,7 @@ class RegisterMap(registers: Traversable[ModbusRegister]) {
 
 import MeasMap._
 
-class MeasMap(di: Traversable[DiscreteInputMap.Mapping], cs: Traversable[CoilStatusMap.Mapping], ir: Traversable[InputRegisterMap.Mapping], hr: Traversable[HoldingRegisterMap.Mapping]) extends Logging {
+class MeasMap(di: Traversable[DiscreteInputMap.Mapping], cs: Traversable[CoilStatusMap.Mapping], ir: Traversable[InputRegisterMap.Mapping], hr: Traversable[HoldingRegisterMap.Mapping]) extends LazyLogging {
 
   def convertDiscreteInput(list: Traversable[ModbusBit]): Traversable[(String, Measurement)] = {
     handleBinary(list, di)

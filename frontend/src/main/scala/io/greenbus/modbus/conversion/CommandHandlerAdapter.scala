@@ -18,7 +18,7 @@
  */
 package io.greenbus.modbus.conversion
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.app.actor.frontend.ProtocolCommandAcceptor
 import io.greenbus.client.service.proto.Commands.{ CommandRequest, CommandResult, CommandStatus }
 import io.greenbus.modbus.xml.{ CommandMap, CommandType }
@@ -27,7 +27,7 @@ import org.totalgrid.modbus.ModbusOperations
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class CommandHandlerAdapter(mappings: Seq[CommandMap.Mapping], ops: ModbusOperations) extends ProtocolCommandAcceptor with Logging {
+class CommandHandlerAdapter(mappings: Seq[CommandMap.Mapping], ops: ModbusOperations) extends ProtocolCommandAcceptor with LazyLogging {
 
   def errorStatus(status: CommandStatus, message: String) = Future.successful(CommandResult.newBuilder().setStatus(status).setErrorMessage(message).build())
   def badRequest(message: String) = errorStatus(CommandStatus.NOT_SUPPORTED, message)

@@ -18,14 +18,13 @@
  */
 package io.greenbus.modbus.conversion
 
-import org.totalgrid.modbus.{ ModbusRegister, ModbusBit, ModbusDeviceObserver }
+import com.typesafe.scalalogging.LazyLogging
+import org.totalgrid.modbus.{ ModbusBit, ModbusDeviceObserver, ModbusRegister }
 import io.greenbus.client.service.proto.Measurements
-import io.greenbus.app.actor.frontend.{ StackStatusUpdated, MeasurementsPublished }
+import io.greenbus.app.actor.frontend.{ MeasurementsPublished, StackStatusUpdated }
 import io.greenbus.modbus.xml.DataType
-import com.typesafe.scalalogging.slf4j.Logging
-import io.greenbus.client.service.proto.FrontEnd.FrontEndConnectionStatus
 
-class DeviceObserverAdapter(map: MeasMap, measPublish: MeasurementsPublished => Unit) extends ModbusDeviceObserver with Logging {
+class DeviceObserverAdapter(map: MeasMap, measPublish: MeasurementsPublished => Unit) extends ModbusDeviceObserver with LazyLogging {
 
   private def publish(pollType: DataType)(filter: => Traversable[(String, Measurements.Measurement)]) = {
     val out = filter.toList

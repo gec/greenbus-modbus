@@ -18,15 +18,15 @@
  */
 package io.greenbus.modbus.integration
 
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Processing.Filter.FilterType
-import io.greenbus.client.service.proto.{ Processing, Model }
+import io.greenbus.client.service.proto.{ Model, Processing }
 import io.greenbus.client.service.proto.Processing._
 import io.greenbus.loader.set.Actions._
-import io.greenbus.loader.set.{ ByteArrayValue, NamedEntId, Mdl, Upload }
+import io.greenbus.loader.set.{ ByteArrayValue, Mdl, NamedEntId, Upload }
 import io.greenbus.msg.Session
 
-object ModbusIntegrationConfiguration extends Logging {
+object ModbusIntegrationConfiguration extends LazyLogging {
 
   val statusPoints = Set("Device01.Status01", "Device01.Status02")
   val analogPoints = Set("Device01.Analog01", "Device01.Analog02")

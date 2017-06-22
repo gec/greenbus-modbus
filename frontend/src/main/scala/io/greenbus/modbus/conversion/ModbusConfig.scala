@@ -23,14 +23,14 @@ import io.greenbus.client.service.proto.Model.EntityKeyValue
 import javax.xml.bind.JAXBContext
 import java.io.ByteArrayInputStream
 
+import com.typesafe.scalalogging.LazyLogging
 import org.totalgrid.modbus.poll.Poll
 
 import scala.collection.JavaConversions._
-import com.typesafe.scalalogging.slf4j.Logging
 
 case class ModbusConfig(polls: Seq[Poll], measMap: MeasMap, cmdMap: Seq[CommandMap.Mapping], modbusAddress: Byte, ipAddress: String, port: Int, protocol: ProtocolType)
 
-object ModbusConfig extends Logging {
+object ModbusConfig extends LazyLogging {
 
   def convertXml(marshaller: ModbusXmlMarshaller, file: EntityKeyValue): Option[ModbusConfig] = {
     if (file.getValue.hasByteArrayValue) {

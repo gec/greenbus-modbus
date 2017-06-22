@@ -22,21 +22,20 @@ import java.util.UUID
 
 import akka.actor.{ ActorContext, ActorRef, ActorSystem }
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.slf4j.Logging
+import com.typesafe.scalalogging.LazyLogging
 import io.greenbus.client.service.proto.Model.ModelUUID
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import org.scalatest.matchers.ShouldMatchers
-import org.scalatest.{ BeforeAndAfterAll, FunSuite }
+import org.scalatest.{ BeforeAndAfterAll, FunSuite, Matchers }
 import io.greenbus.msg.Session
 import io.greenbus.msg.amqp.AmqpSettings
 import io.greenbus.msg.qpid.QpidBroker
 import io.greenbus.app.actor.{ AmqpConnectionConfig, ProtocolsEndpointStrategy }
-import io.greenbus.app.actor.frontend.{ FrontendRegistrationConfig, FrontendFactory, MasterProtocol }
+import io.greenbus.app.actor.frontend.{ FrontendFactory, FrontendRegistrationConfig, MasterProtocol }
 import io.greenbus.client.ServiceConnection
 import io.greenbus.client.service.proto.CommandRequests.CommandSelect
 import io.greenbus.client.service.proto.Commands
-import io.greenbus.client.service.proto.Commands.{ CommandStatus, CommandResult, CommandRequest }
+import io.greenbus.client.service.proto.Commands.{ CommandRequest, CommandResult, CommandStatus }
 import io.greenbus.client.service.proto.FrontEnd.{ FrontEndConnectionStatus, FrontEndConnectionStatusNotification }
 import io.greenbus.client.service.proto.Measurements.{ MeasurementNotification, Quality }
 import io.greenbus.client.service.proto.ModelRequests.EntityKeySet
@@ -49,11 +48,11 @@ import io.greenbus.services.{ CoreServices, ResetDatabase, ServiceManager }
 import io.greenbus.util.UserSettings
 
 import scala.collection.JavaConversions._
-import scala.concurrent.{ Future, Await }
+import scala.concurrent.{ Await, Future }
 import scala.concurrent.duration._
 
 @RunWith(classOf[JUnitRunner])
-class ModbusIntegrationTest extends FunSuite with ShouldMatchers with Logging with BeforeAndAfterAll {
+class ModbusIntegrationTest extends FunSuite with Matchers with LazyLogging with BeforeAndAfterAll {
   import io.greenbus.integration.tools.PollingUtils._
   import io.greenbus.modbus.integration.ModbusIntegrationConfiguration._
 

@@ -18,16 +18,15 @@
  */
 package io.greenbus.modbus.conversion
 
-import org.scalatest.FunSuite
-import org.scalatest.matchers.ShouldMatchers
+import org.scalatest.{ FunSuite, Matchers }
 import org.scalatest.junit.JUnitRunner
 import org.junit.runner.RunWith
 import org.totalgrid.modbus.{ ByteX2, ModbusRegister }
 import io.greenbus.client.service.proto.Measurements.Measurement
-import io.greenbus.modbus.xml.{ HoldingRegisterMap, InputRegisterMap, Conversion }
+import io.greenbus.modbus.xml.{ Conversion, HoldingRegisterMap, InputRegisterMap }
 
 @RunWith(classOf[JUnitRunner])
-class MeasMapTestSuite extends FunSuite with ShouldMatchers {
+class MeasMapTestSuite extends FunSuite with Matchers {
 
   test("Converts unsigned 16bit inputs registers") {
     val mm = new MeasMap(Nil, Nil, List(XmlGenerator.toNumber(new InputRegisterMap.Mapping, 0, "toNum", Conversion.U_INT_16)), Nil)
@@ -61,7 +60,7 @@ class MeasMapTestSuite extends FunSuite with ShouldMatchers {
     val list = List(ModbusRegister(1, ByteX2("4049")), ModbusRegister(2, ByteX2("0FD0")))
     val meas = mm.convertHoldingRegister(list)
     meas.size should equal(1)
-    meas.head._2.getDoubleVal() should be(3.14159 plusOrMinus 1e-6)
+    meas.head._2.getDoubleVal() should be(3.14159 +- 1e-6)
   }
 
   test("Converts doubles") {
@@ -75,7 +74,7 @@ class MeasMapTestSuite extends FunSuite with ShouldMatchers {
       ModbusRegister(4, ByteX2("866E")))
     val meas = mm.convertHoldingRegister(list)
     meas.size should equal(1)
-    meas.head._2.getDoubleVal() should be(3.14159 plusOrMinus 1e-6)
+    meas.head._2.getDoubleVal() should be(3.14159 +- 1e-6)
   }
 
   def testIntVal(f: Traversable[ModbusRegister] => Traversable[(String, Measurement)], regs: Seq[ModbusRegister], shouldBe: Int): Unit = {

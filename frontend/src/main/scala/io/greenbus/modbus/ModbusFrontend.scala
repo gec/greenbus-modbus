@@ -23,15 +23,15 @@ import java.util.UUID
 
 import akka.actor.{ ActorContext, ActorSystem }
 import com.typesafe.config.ConfigFactory
-import com.typesafe.scalalogging.slf4j.Logging
-import io.greenbus.app.actor.frontend.json.{ JsonFrontendRegistrationConfig, JsonFrontendConfiguration }
+import com.typesafe.scalalogging.LazyLogging
+import io.greenbus.app.actor.frontend.json.{ JsonFrontendConfiguration, JsonFrontendRegistrationConfig }
 import io.greenbus.app.actor.json.JsonAmqpConfig
 import io.greenbus.app.actor.{ AmqpConnectionConfig, EndpointCollectionStrategy, ProtocolsEndpointStrategy }
 import io.greenbus.app.actor.frontend._
 import io.greenbus.modbus.conversion.ModbusConfig
 import org.apache.commons.io.IOUtils
 
-object ModbusFrontend extends Logging {
+object ModbusFrontend extends LazyLogging {
 
   def main(args: Array[String]) {
 
