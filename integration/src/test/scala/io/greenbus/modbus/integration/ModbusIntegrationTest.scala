@@ -81,7 +81,7 @@ class ModbusIntegrationTest extends FunSuite with Matchers with LazyLogging with
     ResetDatabase.reset(testConfigPath)
 
     logger.info("starting services")
-    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServices)))
+    services = Some(system.actorOf(ServiceManager.props(testConfigPath, testConfigPath, CoreServices.runServicesSql)))
 
     val amqpConfig = AmqpSettings.load(testConfigPath)
     val conn = ServiceConnection.connect(amqpConfig, QpidBroker, 1500)
@@ -98,7 +98,7 @@ class ModbusIntegrationTest extends FunSuite with Matchers with LazyLogging with
     ModbusIntegrationConfiguration.loadActions(ModbusIntegrationConfiguration.buildConfig("Device01", "Endpoint01", 34001, "modbus"), session)
 
     logger.info("starting processor")
-    processor = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, 20000, "testNode")))
+    processor = Some(system.actorOf(MeasurementProcessor.buildProcessor(testConfigPath, testConfigPath, testConfigPath, testConfigPath, 20000, "testNode")))
 
     Thread.sleep(500)
   }
